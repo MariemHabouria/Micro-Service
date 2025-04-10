@@ -1,5 +1,5 @@
 package com.esprit.microservice.gestionabonnement.Entites;
 
 public enum StatutAbonnement {
-    ACTIF, EXPIRE, ANNULE
+    ACTIF, EXPIRE, ANNULE,EN_PAUSE
 }

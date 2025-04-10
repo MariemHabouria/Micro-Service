@@ -6,11 +6,15 @@ import com.esprit.microservice.gestionabonnement.Repositories.AbonnementReposito
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +69,68 @@ public class AbonnementService {
             default:
                 return LocalDate.now();
         }
+    }
+    public Abonnement mettreEnPause(Long id) {
+        Optional<Abonnement> abonnementOpt = abonnementRepository.findById(id);
+        if (abonnementOpt.isPresent()) {
+            Abonnement abonnement = abonnementOpt.get();
+            abonnement.setStatut(StatutAbonnement.EN_PAUSE);
+            return abonnementRepository.save(abonnement);
+        }
+        return null;
+    }
+
+    // Reprendre un abonnement après une pause
+    public Abonnement reprendreAbonnement(Long id) {
+        Optional<Abonnement> abonnementOpt = abonnementRepository.findById(id);
+        if (abonnementOpt.isPresent()) {
+            Abonnement abonnement = abonnementOpt.get();
+            abonnement.setStatut(StatutAbonnement.ACTIF);
+            // Ajuster la date de fin en fonction des jours restants avant la pause
+            long joursRestants = ChronoUnit.DAYS.between(LocalDate.now(), abonnement.getDateFin());
+            abonnement.setDateFin(LocalDate.now().plusDays(joursRestants));
+            return abonnementRepository.save(abonnement);
+        }
+        return null;
+    }
+    // Activer/désactiver le renouvellement automatique
+    public Abonnement toggleRenouvellementAuto(Long id, boolean active) {
+        Optional<Abonnement> abonnementOpt = abonnementRepository.findById(id);
+        if (abonnementOpt.isPresent()) {
+            Abonnement abonnement = abonnementOpt.get();
+            abonnement.setRenouvellementAuto(active);
+            return abonnementRepository.save(abonnement);
+        }
+        return null;
+    }
+
+    // Tâche planifiée pour renouveler les abonnements (à exécuter quotidiennement)
+    @Scheduled(cron = "0 0 0 * * ?") // Minuit chaque jour
+    public void renouvelerAbonnements() {
+        List<Abonnement> abonnements = abonnementRepository.findByRenouvellementAutoAndStatut(true, StatutAbonnement.ACTIF);
+        abonnements.stream()
+                .filter(a -> LocalDate.now().isAfter(a.getDateFin().minusDays(3))) // 3 jours avant expiration
+                .forEach(a -> {
+                    Abonnement nouvelAbonnement = new Abonnement();
+                    nouvelAbonnement.setUserId(a.getUserId());
+                    nouvelAbonnement.setType(a.getType());
+                    nouvelAbonnement.setPrix(a.getPrix());
+                    creerAbonnement(nouvelAbonnement); // Crée un nouvel abonnement
+                });
+    }
+
+    // Stats
+    public Map<StatutAbonnement, Long> getStatsAbonnements() {
+        List<Object[]> stats = abonnementRepository.countAbonnementsByStatut();
+        return stats.stream()
+                .collect(Collectors.toMap(
+                        e -> StatutAbonnement.valueOf((String) e[0]),
+                        e -> (Long) e[1]
+                ));
+    }
+
+    // Revenus
+    public Double getRevenusMensuels(int mois, int annee) {
+        return abonnementRepository.calculateRevenueForMonth(mois, annee);
     }
 }

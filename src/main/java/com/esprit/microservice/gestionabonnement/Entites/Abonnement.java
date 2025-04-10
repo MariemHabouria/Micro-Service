@@ -29,4 +29,5 @@ private Long id;
 
         @Enumerated(EnumType.STRING)
         private StatutAbonnement statut; // ACTIF, EXPIRE, ANNULE
+        private boolean renouvellementAuto;
 }

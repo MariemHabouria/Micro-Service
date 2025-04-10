@@ -1,12 +1,14 @@
 package com.esprit.microservice.gestionabonnement.Controllers;
 
 import com.esprit.microservice.gestionabonnement.Entites.Abonnement;
+import com.esprit.microservice.gestionabonnement.Entites.StatutAbonnement;
 import com.esprit.microservice.gestionabonnement.Services.AbonnementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -49,5 +51,35 @@ public class AbonnementRestAPI {
     public ResponseEntity<Boolean> utilisateurAAbonnementActif(@PathVariable String userId) {
         boolean actif = abonnementService.utilisateurAAbonnementActif(userId);
         return ResponseEntity.ok(actif);
+    }
+    @PutMapping("/{id}/pause")
+    public ResponseEntity<Abonnement> mettreEnPause(@PathVariable Long id) {
+        Abonnement abonnement = abonnementService.mettreEnPause(id);
+        return abonnement != null ? ResponseEntity.ok(abonnement) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/reprendre")
+    public ResponseEntity<Abonnement> reprendreAbonnement(@PathVariable Long id) {
+        Abonnement abonnement = abonnementService.reprendreAbonnement(id);
+        return abonnement != null ? ResponseEntity.ok(abonnement) : ResponseEntity.notFound().build();
+    }
+    @PutMapping("/{id}/renouvellement-auto")
+    public ResponseEntity<Abonnement> toggleRenouvellementAuto(
+            @PathVariable Long id,
+            @RequestParam boolean active) {
+        Abonnement abonnement = abonnementService.toggleRenouvellementAuto(id, active);
+        return abonnement != null ? ResponseEntity.ok(abonnement) : ResponseEntity.notFound().build();
+    }
+    @GetMapping("/stats")
+    public ResponseEntity<Map<StatutAbonnement, Long>> getStats() {
+        return ResponseEntity.ok(abonnementService.getStatsAbonnements());
+    }
+
+    // Revenus
+    @GetMapping("/revenus/{mois}/{ane}")
+    public ResponseEntity<Double> getRevenusMensuels(
+            @PathVariable("mois") int mois,
+            @PathVariable("ane") int annee) {
+        return ResponseEntity.ok(abonnementService.getRevenusMensuels(mois, annee));
     }
 }
