@@ -1,0 +1,28 @@
+services:
+  eurekaserver:
+    build:
+      context: ./eureka-server
+    ports:
+      - "8761:8761"
+    container_name: eurekaserver
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ./Gateway
+    ports:
+      - "8093:8093"
+    container_name: gateway
+    depends_on:
+      - eurekaserver
+    restart: unless-stopped
+
+  gestionevent:
+    build:
+      context: ./Event/GestionEvent
+    ports:
+      - "8085:8085"
+    container_name: gestionevent
+    depends_on:
+      - eurekaserver
+    restart: unless-stopped
