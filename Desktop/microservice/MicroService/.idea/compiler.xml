@@ -7,15 +7,30 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-server" />
+        <module name="GestionProduit" />
         <module name="GestionEvent" />
         <module name="Gateway" />
+        <module name="GestionAbonnement" />
+      </profile>
+      <profile name="Annotation profile for MicroService" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="Produit" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Gateway" options="-parameters" />
+      <module name="GestionAbonnement" options="-parameters" />
       <module name="GestionEvent" options="-parameters" />
+      <module name="GestionProduit" options="-parameters" />
+      <module name="Produit" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
     </option>
   </component>

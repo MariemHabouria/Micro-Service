@@ -7,6 +7,8 @@
         <option value="$PROJECT_DIR$/Event/GestionEvent/pom.xml" />
         <option value="$PROJECT_DIR$/Gateway/pom.xml" />
         <option value="$PROJECT_DIR$/eureka-server/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/GestionAbonnement/pom.xml" />
       </list>
     </option>
   </component>

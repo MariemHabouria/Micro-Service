@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   eurekaserver:
     build:
@@ -5,7 +7,7 @@ services:
     ports:
       - "8761:8761"
     container_name: eurekaserver
-    restart: unless-stopped
+    restart: always
 
   gateway:
     build:
@@ -15,7 +17,7 @@ services:
     container_name: gateway
     depends_on:
       - eurekaserver
-    restart: unless-stopped
+    restart: always
 
   gestionevent:
     build:
@@ -25,4 +27,34 @@ services:
     container_name: gestionevent
     depends_on:
       - eurekaserver
-    restart: unless-stopped
+    restart: always
+
+  gestionabonnement:
+    build:
+      context: ./GestionAbonnement
+    ports:
+      - "8084:8084"
+    container_name: gestionabonnement
+    depends_on:
+      - eurekaserver
+    restart: always
+
+
+  gestionproduit:
+    build:
+      context: ./GestionProduit
+    ports:
+      - "8086:8086"
+    container_name: gestionproduit
+    depends_on:
+      - eurekaserver
+    restart: always
+  gestioncours:
+    build:
+      context: ./Cours
+    ports:
+      - "8087:8087"
+    container_name: gestioncours
+    depends_on:
+      - eurekaserver
+    restart: always
