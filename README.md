@@ -1,6 +1,6 @@
 # Projet Microservices Salle de Sport
 
-![Architecture Microservices](https://i.imgur.com/JKQmQ0E.png)
+
 
 ## 📋 Description
 Ce projet implémente une architecture microservices pour une application de gestion de salle de sport, comprenant :
